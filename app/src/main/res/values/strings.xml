@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">StreamOn</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="txt_trending_movies">Trending Now</string>
+    <string name="txt_discover_movies">Discover Movies</string>
+    <string name="txt_popular">Popular on StreamOn</string>
+</resources>
