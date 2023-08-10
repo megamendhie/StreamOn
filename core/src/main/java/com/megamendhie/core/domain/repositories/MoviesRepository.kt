@@ -1,6 +1,7 @@
 package com.megamendhie.core.domain.repositories
 
 import android.util.Log
+import androidx.lifecycle.MutableLiveData
 import com.megamendhie.core.data.database.MoviesDao
 import com.megamendhie.core.data.models.*
 import com.megamendhie.core.data.remote.TheMovieDbApi
@@ -20,6 +21,8 @@ class MoviesRepository @Inject constructor(val moviesDao: MoviesDao, private val
     private val includeAdult = "false"
     private val includeVideo = "false"
     private val language = "en-US"
+
+    val addFavoriteMovieResponse: MutableLiveData<Int> = MutableLiveData(0)
 
     fun getDiscoveredMovies(token: String, page: Int) {
         val sortBy = "popularity.desc"
@@ -68,24 +71,6 @@ class MoviesRepository @Inject constructor(val moviesDao: MoviesDao, private val
         })
     }
 
-    fun getFavoriteMovies(token: String, page: Int) {
-        val sortBy = "created_at.asc"
-        TheMovieDbApi.tmdbApi.getFavoriteMovies(
-            token, language, page.toString(), sortBy
-        ).enqueue(object : Callback<TrendingMovieResponse>{
-            override fun onResponse(
-                call: Call<TrendingMovieResponse>,
-                response: Response<TrendingMovieResponse>
-            ) {
-                Log.d(TAG, "onResponse getFavoriteMovies: $response")
-            }
-
-            override fun onFailure(call: Call<TrendingMovieResponse>, t: Throwable) {
-                Log.d(TAG, "onFailure getFavoriteMovies: $t")
-            }
-        })
-    }
-
     fun getTrendingMovies(token: String, page: Int) {
         TheMovieDbApi.tmdbApi.getTrendingMovies(
             token, page.toString()
@@ -110,15 +95,65 @@ class MoviesRepository @Inject constructor(val moviesDao: MoviesDao, private val
         })
     }
 
-    fun addFavoriteMovie(token: String, favorite: AddFavorite) {
+    fun getFavoriteMovies(token: String, page: Int) {
+        val sortBy = "created_at.asc"
+        TheMovieDbApi.tmdbApi.getFavoriteMovies(
+            token, language, page.toString(), sortBy
+        ).enqueue(object : Callback<TrendingMovieResponse>{
+            override fun onResponse(
+                call: Call<TrendingMovieResponse>,
+                response: Response<TrendingMovieResponse>
+            ) {
+                Log.d(TAG, "onResponse getFavoriteMovies: $response")
+                if(response.isSuccessful){
+                    scope.launch {
+                        val movies = response.body()?.results ?: listOf()
+                        val m = movies.map { FavoriteMovie(it.id, it.title) }
+                        moviesDao.insertFavoriteMovies(m)
+                    }
+                }
+            }
+
+            override fun onFailure(call: Call<TrendingMovieResponse>, t: Throwable) {
+                Log.d(TAG, "onFailure getFavoriteMovies: $t")
+            }
+        })
+    }
+
+    fun addFavoriteMovie(token: String, favorite: FavoriteMovie, add: Boolean) {
+        val fav = AddFavorite("movie", favorite.id, add)
+
         TheMovieDbApi.tmdbApi.addFavoriteMovie(
-            token, "application/json", favorite
+            token, "application/json", fav
         ).enqueue(object : Callback<AddFavoriteResponse> {
             override fun onResponse(
                 call: Call<AddFavoriteResponse>,
                 response: Response<AddFavoriteResponse>
             ) {
-                Log.d(TAG, "onResponse addFavoriteMovie: $response")
+                Log.d(TAG, "onResponse addFavoriteMovie: $response - ${response.body()}")
+                if (response.isSuccessful){
+                    val responseBody = response.body()
+                    responseBody?.let {
+                        if(it.success){
+                            when(it.statusCode){
+                                //insert favorite movie to db when add, and delete from db when removed
+                                1, 12 ->{
+                                    scope.launch {
+                                        moviesDao.insertFavoriteMovie(favorite)
+                                        addFavoriteMovieResponse.postValue(it.statusCode)
+                                    }
+                                }
+                                13 ->{
+                                    scope.launch {
+                                        moviesDao.deleteFavoriteMovie(favorite.id)
+                                        addFavoriteMovieResponse.postValue(it.statusCode)
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                }
             }
 
             override fun onFailure(call: Call<AddFavoriteResponse>, t: Throwable) {
@@ -143,6 +178,10 @@ class MoviesRepository @Inject constructor(val moviesDao: MoviesDao, private val
             }
 
         })
+    }
+
+    fun clearValue(){
+        addFavoriteMovieResponse.value = 0
     }
 
     fun getMovieGenres(token: String){

@@ -14,6 +14,17 @@ import com.megamendhie.core.data.models.*
 
 @Dao
 interface MoviesDao {
+    @Insert(onConflict = REPLACE)
+    fun insertFavoriteMovies(movies: List<FavoriteMovie>)
+
+    @Insert(onConflict = REPLACE)
+    fun insertFavoriteMovie(movie: FavoriteMovie)
+
+    @Query("SELECT * FROM favorite_movies_table")
+    fun getFavoriteMovies(): LiveData<List<FavoriteMovie>>
+
+    @Query("DELETE FROM favorite_movies_table WHERE id = :movieId")
+    fun deleteFavoriteMovie(movieId: Int)
 
     @Insert(onConflict = REPLACE)
     fun insertTrendingMovies(movies: List<TrendingMovie>)

@@ -20,7 +20,7 @@ const val popularMovies = "movie/popular"
 const val addFavoriteMovie = "account/20247142/favorite"
 const val getFavoriteMovies = "account/20247142/favorite/movies"
 
-val retrofit = Retrofit.Builder()
+val retrofit: Retrofit = Retrofit.Builder()
     .baseUrl(BASE_URL)
     .addConverterFactory(GsonConverterFactory.create())
     .build()

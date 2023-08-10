@@ -17,7 +17,7 @@ import javax.inject.Provider
 
 @Database(
     entities = [MovieDetails::class, TrendingMovie::class, PopularMovie::class,
-        DiscoverMovie::class, MovieGenre::class],
+        DiscoverMovie::class, MovieGenre::class, FavoriteMovie::class],
     version = 1,
     exportSchema = false
 )

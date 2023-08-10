@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.snackbar.Snackbar
 import com.megamendhie.core.data.models.FavoriteMovie
 import com.megamendhie.core.data.models.Movie
 import com.megamendhie.streamon.BuildConfig
@@ -31,6 +32,7 @@ class HomeFragment : Fragment(), MoviesAdapterInterface {
     private lateinit var  adapterDiscoverMovies: MoviesAdapter
 
     private var favoriteMovies: List<Int> = listOf()
+    private var popularMovies: List<Movie> = listOf()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -39,6 +41,9 @@ class HomeFragment : Fragment(), MoviesAdapterInterface {
         // Inflate the layout for this fragment
         binding = FragmentHomeBinding.inflate(inflater, container, false)
         binding.fragment = this
+
+        //clear favorite movies response
+        viewModel.clearVal()
 
         //setup layout manager and adapter for popular movies
         adapterPopularMovies = MoviesAdapter(this)
@@ -55,6 +60,11 @@ class HomeFragment : Fragment(), MoviesAdapterInterface {
         binding.lstDiscoverMovies.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
         binding.lstDiscoverMovies.adapter = adapterDiscoverMovies
 
+
+        viewModel.favoriteMovies.observe(viewLifecycleOwner){movies->
+            favoriteMovies = movies.map { it.id }
+            adapterPopularMovies.updateMovies(popularMovies, favoriteMovies, POPULAR_MOVIES)
+        }
         viewModel.trendingMovies.observe(viewLifecycleOwner){ movieList ->
             val movies = movieList.map { Movie(
                 id = it.id, title = it.title, posterPath = it.posterPath, releaseDate = it.releaseDate,
@@ -69,6 +79,7 @@ class HomeFragment : Fragment(), MoviesAdapterInterface {
                 voteAverage = it.voteAverage, overview = it.overview, popularity = it.popularity,
                 adult = it.adult, genreIds = it.genreIds, backdropPath = it.backdropPath
             ) }
+            popularMovies = movies
             adapterPopularMovies.updateMovies(movies, favoriteMovies, POPULAR_MOVIES)
         }
         viewModel.discoverMovies.observe(viewLifecycleOwner){ movieList ->
@@ -80,6 +91,13 @@ class HomeFragment : Fragment(), MoviesAdapterInterface {
             adapterDiscoverMovies.updateMovies(movies)
         }
 
+        viewModel.addFavoriteMovieResponse.observe(viewLifecycleOwner){responseCode->
+            when(responseCode){
+                1, 12 -> Snackbar.make(binding.txtPopularMovies, "Added to favorites", Snackbar.LENGTH_SHORT).show()
+                13 -> Snackbar.make(binding.txtDiscoverMovies, "Removed from favorites", Snackbar.LENGTH_SHORT).show()
+            }
+        }
+
         //retrieve TMDB token from buildConfig
         token = BuildConfig.TMDB_TOKEN
 
@@ -88,6 +106,9 @@ class HomeFragment : Fragment(), MoviesAdapterInterface {
     }
 
     private fun fetchMovies() {
+        //get favorite movies
+        viewModel.getFavoriteMovies(token)
+
         //get popular movies
         viewModel.getPopularMovies(token)
 
@@ -96,16 +117,15 @@ class HomeFragment : Fragment(), MoviesAdapterInterface {
 
         //get discovered movies
         viewModel.getDiscoveredMovies(token)
-
-        //get favorite movies
-        viewModel.getFavoriteMovies(token)
     }
 
     fun seeAllClick(view: View){
-        Toast.makeText(requireContext(), "Not necessary in this version", Toast.LENGTH_SHORT).show()
+        Toast.makeText(requireContext(), "Not required in this version", Toast.LENGTH_SHORT).show()
     }
 
     override fun favIconClick(movie: FavoriteMovie) {
         Toast.makeText(requireContext(), "$movie", Toast.LENGTH_SHORT).show()
+        val add = !favoriteMovies.contains(movie.id)
+        viewModel.addFavorite(token, movie, add)
     }
 }
