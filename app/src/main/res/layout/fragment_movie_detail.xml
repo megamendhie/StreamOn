@@ -82,13 +82,6 @@
                 android:layout_height="match_parent"
                 android:padding="@dimen/screen_padding">
 
-                <View
-                    android:layout_width="1dp"
-                    android:layout_height="16dp"
-                    android:background="@color/purple_500"
-                    app:layout_constraintTop_toBottomOf="@id/txtTitle"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"/>
                 <TextView
                     android:id="@+id/txtTitle"
                     android:layout_width="match_parent"
@@ -103,15 +96,16 @@
 
                 <TextView
                     android:id="@+id/txtAvgTx"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
-                    android:layout_marginStart="30dp"
                     android:text="User Score"
+                    android:gravity="center"
                     android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
                     android:textStyle="bold"
+                    app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/txtTitle"
-                    app:layout_constraintStart_toStartOf="parent"/>
+                    app:layout_constraintEnd_toStartOf="@id/txtAdultTx"/>
 
                 <TextView
                     android:id="@+id/txtAvg"
@@ -129,7 +123,7 @@
                     android:id="@+id/txtPopularityTx"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Popularity"
+                    android:text=""
                     android:textStyle="bold"
                     android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
                     app:layout_constraintTop_toTopOf="@id/txtAvgTx"
@@ -137,25 +131,15 @@
                     app:layout_constraintEnd_toStartOf="@id/txtAdultTx"/>
 
                 <TextView
-                    android:id="@+id/txtPopularity"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:text="XX"
-                    android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
-                    app:layout_constraintTop_toBottomOf="@id/txtPopularityTx"
-                    app:layout_constraintStart_toStartOf="@id/txtPopularityTx"
-                    app:layout_constraintEnd_toEndOf="@id/txtPopularityTx"/>
-
-                <TextView
                     android:id="@+id/txtAdultTx"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="30dp"
                     android:text="Adult"
+                    android:gravity="center"
                     android:textStyle="bold"
                     android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
                     app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/txtAvgTx"
                     app:layout_constraintTop_toTopOf="@id/txtAvgTx"/>
 
                 <TextView
@@ -175,26 +159,14 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
-                    android:gravity="end"
+                    android:gravity="center"
                     tools:text="12/34/2023"
                     android:textSize="15sp"
                     android:text="@{viewModel.trendingMovie.releaseDate}"
                     android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
                     app:layout_constraintTop_toBottomOf="@id/txtAvg"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toStartOf="@id/txtMovieLength"/>
-
-                <TextView
-                    android:id="@+id/txtMovieLength"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="10dp"
-                    tools:text="2h 40m"
-                    android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
-                    app:layout_constraintTop_toTopOf="@id/txtReleaseDate"
-                    app:layout_constraintStart_toEndOf="@id/txtReleaseDate"
                     app:layout_constraintEnd_toEndOf="parent"/>
-
 
                 <TextView
                     android:id="@+id/txtGenre"

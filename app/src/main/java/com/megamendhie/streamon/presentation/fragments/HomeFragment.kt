@@ -66,7 +66,13 @@ class HomeFragment : Fragment(), MoviesAdapterInterface {
 
         viewModel.favoriteMovies.observe(viewLifecycleOwner){movies->
             favoriteMovies = movies.map { it.id }
-            adapterPopularMovies.updateMovies(popularMovies, favoriteMovies, POPULAR_MOVIES)
+            if(SWITCH_STATUS){
+                val favMovies = popularMovies.filter { favoriteMovies.contains(it.id) }
+                adapterPopularMovies.updateMovies(favMovies, favoriteMovies, POPULAR_MOVIES)
+            }
+            else{
+                adapterPopularMovies.updateMovies(popularMovies, favoriteMovies, POPULAR_MOVIES)
+            }
         }
         viewModel.trendingMovies.observe(viewLifecycleOwner){ movieList ->
             val movies = movieList.map { Movie(
@@ -83,7 +89,13 @@ class HomeFragment : Fragment(), MoviesAdapterInterface {
                 adult = it.adult, genreIds = it.genreIds, backdropPath = it.backdropPath
             ) }
             popularMovies = movies
-            adapterPopularMovies.updateMovies(movies, favoriteMovies, POPULAR_MOVIES)
+            if(SWITCH_STATUS){
+                val favMovies = popularMovies.filter { favoriteMovies.contains(it.id) }
+                adapterPopularMovies.updateMovies(favMovies, favoriteMovies, POPULAR_MOVIES)
+            }
+            else{
+                adapterPopularMovies.updateMovies(popularMovies, favoriteMovies, POPULAR_MOVIES)
+            }
         }
         viewModel.discoverMovies.observe(viewLifecycleOwner){ movieList ->
             val movies = movieList.map { Movie(
@@ -104,7 +116,18 @@ class HomeFragment : Fragment(), MoviesAdapterInterface {
         //retrieve TMDB token from buildConfig
         token = BuildConfig.TMDB_TOKEN
 
-        //binding.tx
+        binding.swtFavorite.setOnCheckedChangeListener { compoundButton, isChecked ->
+            if(isChecked==SWITCH_STATUS)
+                return@setOnCheckedChangeListener
+            SWITCH_STATUS = isChecked
+            if(SWITCH_STATUS){
+                val favMovies = popularMovies.filter { favoriteMovies.contains(it.id) }
+                adapterPopularMovies.updateMovies(favMovies, favoriteMovies, POPULAR_MOVIES)
+            }
+            else{
+                adapterPopularMovies.updateMovies(popularMovies, favoriteMovies, POPULAR_MOVIES)
+            }
+        }
 
         fetchMovies()
         return binding.root
