@@ -8,24 +8,29 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.megamendhie.core.data.models.FavoriteMovie
 import com.megamendhie.core.data.models.Movie
 import com.megamendhie.streamon.BuildConfig
 import com.megamendhie.streamon.R
 import com.megamendhie.streamon.databinding.FragmentHomeBinding
 import com.megamendhie.streamon.presentation.adapters.MoviesAdapter
+import com.megamendhie.streamon.presentation.interfaces.MoviesAdapterInterface
 import com.megamendhie.streamon.presentation.viewmodels.MoviesViewModel
+import com.megamendhie.streamon.utils.Commons.Companion.POPULAR_MOVIES
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class HomeFragment : Fragment() {
+class HomeFragment : Fragment(), MoviesAdapterInterface {
     private lateinit var binding: FragmentHomeBinding
     @Inject
     lateinit var viewModel: MoviesViewModel
     private lateinit var token: String
-    private val adapterPopularMovies = MoviesAdapter()
-    private val adapterTrendingMovies = MoviesAdapter()
-    private val adapterDiscoverMovies = MoviesAdapter()
+    private lateinit var adapterPopularMovies: MoviesAdapter
+    private lateinit var  adapterTrendingMovies: MoviesAdapter
+    private lateinit var  adapterDiscoverMovies: MoviesAdapter
+
+    private var favoriteMovies: List<Int> = listOf()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -36,14 +41,17 @@ class HomeFragment : Fragment() {
         binding.fragment = this
 
         //setup layout manager and adapter for popular movies
+        adapterPopularMovies = MoviesAdapter(this)
         binding.lstPopularMovies.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
         binding.lstPopularMovies.adapter = adapterPopularMovies
 
         //setup layout manager and adapter for trending movies
+        adapterTrendingMovies = MoviesAdapter(this)
         binding.lstTrendingMovies.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
         binding.lstTrendingMovies.adapter = adapterTrendingMovies
 
         //setup layout manager and adapter for discover movies
+        adapterDiscoverMovies =  MoviesAdapter(this)
         binding.lstDiscoverMovies.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
         binding.lstDiscoverMovies.adapter = adapterDiscoverMovies
 
@@ -61,7 +69,7 @@ class HomeFragment : Fragment() {
                 voteAverage = it.voteAverage, overview = it.overview, popularity = it.popularity,
                 adult = it.adult, genreIds = it.genreIds, backdropPath = it.backdropPath
             ) }
-            adapterPopularMovies.updateMovies(movies)
+            adapterPopularMovies.updateMovies(movies, favoriteMovies, POPULAR_MOVIES)
         }
         viewModel.discoverMovies.observe(viewLifecycleOwner){ movieList ->
             val movies = movieList.map { Movie(
@@ -95,5 +103,9 @@ class HomeFragment : Fragment() {
 
     fun seeAllClick(view: View){
         Toast.makeText(requireContext(), "Not necessary in this version", Toast.LENGTH_SHORT).show()
+    }
+
+    override fun favIconClick(movie: FavoriteMovie) {
+        Toast.makeText(requireContext(), "$movie", Toast.LENGTH_SHORT).show()
     }
 }
