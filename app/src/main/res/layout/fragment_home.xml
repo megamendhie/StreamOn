@@ -19,7 +19,6 @@
             android:layout_height="match_parent"
             android:padding="@dimen/screen_padding">
 
-
             <TextView
                 android:id="@+id/txtPopularMovies"
                 android:layout_width="wrap_content"
@@ -32,22 +31,24 @@
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintStart_toStartOf="parent"/>
 
-            <TextView
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/swtFavorite"
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:text="See All"
+                android:layout_height="wrap_content"
+                android:text="Fav only"
+                android:drawablePadding="10dp"
+                android:textColor="@color/colorPrimary"
                 android:textSize="12sp"
                 android:textStyle="bold"
-                android:onClick="@{(view) -> fragment.seeAllClick(view)}"
                 android:textAppearance="@style/TextAppearance.Material3.BodyMedium"
-                app:layout_constraintBottom_toBottomOf="@id/txtPopularMovies"
+                app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"/>
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/lstPopularMovies"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:minHeight="274dp"
+                android:minHeight="278dp"
                 android:layout_marginTop="@dimen/screen_padding"
                 app:layout_constraintTop_toBottomOf="@id/txtPopularMovies"/>
 
@@ -79,7 +80,7 @@
                 android:id="@+id/lstTrendingMovies"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:minHeight="274dp"
+                android:minHeight="278dp"
                 android:layout_marginTop="@dimen/screen_padding"
                 app:layout_constraintTop_toBottomOf="@id/txtTrendingMovies"/>
 
@@ -110,7 +111,7 @@
                 android:id="@+id/lstDiscoverMovies"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:minHeight="274dp"
+                android:minHeight="278dp"
                 android:layout_marginTop="@dimen/screen_padding"
                 android:layout_marginBottom="4dp"
                 app:layout_constraintTop_toBottomOf="@id/txtDiscoverMovies"

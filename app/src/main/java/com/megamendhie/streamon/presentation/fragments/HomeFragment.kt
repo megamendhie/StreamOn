@@ -34,6 +34,9 @@ class HomeFragment : Fragment(), MoviesAdapterInterface {
     private var favoriteMovies: List<Int> = listOf()
     private var popularMovies: List<Movie> = listOf()
 
+    private var SWITCH_STATUS = false
+
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -101,6 +104,8 @@ class HomeFragment : Fragment(), MoviesAdapterInterface {
         //retrieve TMDB token from buildConfig
         token = BuildConfig.TMDB_TOKEN
 
+        //binding.tx
+
         fetchMovies()
         return binding.root
     }
@@ -124,7 +129,6 @@ class HomeFragment : Fragment(), MoviesAdapterInterface {
     }
 
     override fun favIconClick(movie: FavoriteMovie) {
-        Toast.makeText(requireContext(), "$movie", Toast.LENGTH_SHORT).show()
         val add = !favoriteMovies.contains(movie.id)
         viewModel.addFavorite(token, movie, add)
     }
